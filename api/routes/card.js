@@ -3,8 +3,10 @@ const router = express.Router();
 const mongoose = require("mongoose");
 
 const Card = require("../models/card");
+const translate = require("translate-google");
+const axios = require("axios");
 
-router.get("/", (req, res, next) => {
+router.get("/", async (req, res, next) => {
     Card.find()
         .exec()
         .then((result) => {
@@ -67,6 +69,29 @@ router.delete("/:cardId", (req, res, next) => {
             res.status(500).json({ error: err });
         });
 });
+
+const translation = async (text, target = "fa") => {
+    const text = "Hello, world";
+    const target = "fa";
+
+    const translation = await translate(text, { from: "auto", to: target });
+    return translation;
+};
+
+const getWordInformation = (word) => {
+    axios
+        .get(`https://api.dictionaryapi.dev/api/v2/entries/en/${word}`)
+        .then((resData) => {
+            return {
+                phonetic: resData.data[0].phonetic,
+                partOfSpeech: resData.data[0].meanings[0].partOfSpeech,
+                definitions: resData.data[0].meanings[0].definitions,
+            };
+        })
+        .catch((err) => {
+            console.log(err);
+        });
+};
 
 router.post("/", (req, res, next) => {
     const card = new Card({
