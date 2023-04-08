@@ -71,42 +71,62 @@ router.delete("/:cardId", (req, res, next) => {
 });
 
 const translation = async (text, target = "fa") => {
-    const text = "Hello, world";
-    const target = "fa";
+    // const text = "Hello, world";
+    // const target = "fa";
 
     const translation = await translate(text, { from: "auto", to: target });
     return translation;
 };
 
-const getWordInformation = (word) => {
-    axios
+const getWordInformation = async (word) => {
+    const detail = await axios
         .get(`https://api.dictionaryapi.dev/api/v2/entries/en/${word}`)
         .then((resData) => {
             return {
                 phonetic: resData.data[0].phonetic,
-                partOfSpeech: resData.data[0].meanings[0].partOfSpeech,
-                definitions: resData.data[0].meanings[0].definitions,
+                meanings: resData.data[0].meanings,
             };
         })
         .catch((err) => {
-            console.log(err);
+            return "ERROR";
         });
+    return detail;
 };
 
-router.post("/", (req, res, next) => {
+router.post("/", async (req, res, next) => {
+    const difficulty = req.body.difficulty ? req.body.difficulty : "easy";
     const card = new Card({
         _id: new mongoose.Types.ObjectId(),
         text: req.body.text,
-        translation: req.body.translation,
-        status: req.body.status,
+        translation: await translation(req.body.text),
+        status: "need Practice",
+        difficulty: difficulty,
     });
     card.save()
         .then((result) => {
-            console.log(result);
+            // console.log(result);
             res.status(201).json({
                 message: "handle post",
                 createdCard: result,
             });
+            //FIXME
+            getWordInformation(result.text)
+                .then((res) => {
+                    if (res !== "ERROR") {
+                        Card.findOneAndUpdate(
+                            { _id: result._id },
+                            {
+                                $set: {
+                                    phonetic: res.phonetic,
+                                    meanings: res.meanings,
+                                },
+                            },
+                        ).exec();
+                    }
+                })
+                .catch((error) => {
+                    console.log(error);
+                });
         })
         .catch((err) => {
             console.log(err);
