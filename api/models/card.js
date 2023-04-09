@@ -9,6 +9,7 @@ const cardSchema = mongoose.Schema(
         difficulty: String,
         phonetic: String,
         meanings: Array,
+        remember_ratio: Number,
     },
     { timestamps: { createdAt: "created_at" } },
 );

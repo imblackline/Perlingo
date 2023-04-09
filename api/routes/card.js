@@ -36,6 +36,17 @@ router.get("/:cardId", (req, res, next) => {
             res.status(500).json({ error: err });
         });
 });
+router.patch("/againAll", (req, res, next) => {
+    Card.updateMany({ status: "readed" }, { $set: { status: "need Practice" } })
+        .exec()
+        .then((result) => {
+            res.status(200).json(result);
+        })
+        .catch((err) => {
+            console.log(err);
+            res.status(500).json({ error: err });
+        });
+});
 router.patch("/:cardId", (req, res, next) => {
     const id = req.params.cardId;
     const updateOptions = {};
@@ -57,6 +68,7 @@ router.patch("/:cardId", (req, res, next) => {
             res.status(500).json({ error: err });
         });
 });
+
 router.delete("/:cardId", (req, res, next) => {
     const id = req.params.cardId;
     Card.findOneAndRemove({ _id: id })
@@ -100,6 +112,7 @@ router.post("/", async (req, res, next) => {
         text: req.body.text,
         translation: await translation(req.body.text),
         status: "need Practice",
+        remember_ratio: 0,
         difficulty: difficulty,
     });
     card.save()
