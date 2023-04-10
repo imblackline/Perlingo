@@ -2,11 +2,12 @@ const express = require("express");
 const router = express.Router();
 const mongoose = require("mongoose");
 
+const checkAuth = require('../middleware/check-auth')
 const Card = require("../models/card");
 const translate = require("translate-google");
 const axios = require("axios");
 
-router.get("/", async (req, res, next) => {
+router.get("/",checkAuth, async (req, res, next) => {
     Card.find()
         .exec()
         .then((result) => {

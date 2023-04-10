@@ -1,5 +1,6 @@
 {
     "env":{
-        "MONGO_ATLAS_PW":"Amir%4020142014"
+        "MONGO_ATLAS_PW":"Amir%4020142014",
+        "JWT_KEY":"perlingoosecretkey"
     }
 }
