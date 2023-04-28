@@ -19,7 +19,7 @@ router.get("/",checkAuth, async (req, res, next) => {
         });
 });
 
-router.get("/:cardId", (req, res, next) => {
+router.get("/:cardId",checkAuth, (req, res, next) => {
     const id = req.params.cardId;
     Card.findById(id)
         .exec()
@@ -37,7 +37,7 @@ router.get("/:cardId", (req, res, next) => {
             res.status(500).json({ error: err });
         });
 });
-router.patch("/againAll", (req, res, next) => {
+router.patch("/againAll",checkAuth, (req, res, next) => {
     Card.updateMany({ status: "readed" }, { $set: { status: "need Practice" } })
         .exec()
         .then((result) => {
@@ -48,7 +48,7 @@ router.patch("/againAll", (req, res, next) => {
             res.status(500).json({ error: err });
         });
 });
-router.patch("/:cardId", (req, res, next) => {
+router.patch("/:cardId",checkAuth, (req, res, next) => {
     const id = req.params.cardId;
     const updateOptions = {};
     for (const option of req.body) {
@@ -70,7 +70,7 @@ router.patch("/:cardId", (req, res, next) => {
         });
 });
 
-router.delete("/:cardId", (req, res, next) => {
+router.delete("/:cardId",checkAuth, (req, res, next) => {
     const id = req.params.cardId;
     Card.findOneAndRemove({ _id: id })
         .exec()
@@ -106,7 +106,7 @@ const getWordInformation = async (word) => {
     return detail;
 };
 
-router.post("/", async (req, res, next) => {
+router.post("/",checkAuth, async (req, res, next) => {
     const difficulty = req.body.difficulty ? req.body.difficulty : "easy";
     const card = new Card({
         _id: new mongoose.Types.ObjectId(),
